@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            padding-top: 50px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80px;
+            background-color: #e9ecef;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cell:hover {
+            background-color: #dee2e6;
+        }
+
+        .status {
+            margin-top: 20px;
+        }
+
+        .button {
+            margin-top: 20px;
+        }
+
+        .score {
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe Game</h1>
+        <div class="grid">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <div class="status"></div>
+        <div class="button">
+            <button class="btn btn-primary" id="resetBtn">New Game</button>
+        </div>
+        <div class="score">
+            <p>Player X: <span id="playerXScore">0</span></p>
+            <p>Player O: <span id="playerOScore">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        const cells = document.querySelectorAll('.cell');
+        const status = document.querySelector('.status');
+        const playerXScoreDisplay = document.getElementById('playerXScore');
+        const playerOScoreDisplay = document.getElementById('playerOScore');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        let currentPlayer = 'X';
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let gameOver = false;
+        let playerXScore = 0;
+        let playerOScore = 0;
+        let moves = 0;
+        
+        const winPatterns = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+        
+        const checkWin = () => {
+            for (let pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    return board[a];
+                }
+            }
+            return null;
+        };
+        
+        const checkDraw = () => {
+            return board.every(cell => cell !== '');
+        };
+        
+        const updateStatus = () => {
+            if (gameOver) {
+                status.textContent = `Player ${currentPlayer === 'X' ? 'O' : 'X'} wins!`;
+            } else if (checkDraw()) {
+                status.textContent = "It's a draw!";
+            } else {
+                status.textContent = `Player ${currentPlayer}'s turn`;
+            }
+        };
+        
+        const updateScore = () => {
+            playerXScoreDisplay.textContent = playerXScore;
+            playerOScoreDisplay.textContent = playerOScore;
+        };
+        
+        const resetGame = () => {
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            gameOver = false;
+            moves = 0;
+            status.textContent = '';
+            cells.forEach(cell => cell.textContent = '');
+        };
+        
+        const handleCellClick = (index) => {
+            if (gameOver || board[index] !== '') return;
+            
+            board[index] = currentPlayer;
+            cells[index].textContent = currentPlayer;
+            moves++;
+            
+            const winner = checkWin();
+            if (winner) {
+                gameOver = true;
+                if (winner === 'X') {
+                    playerXScore++;
+                } else {
+                    playerOScore++;
+                }
+                updateScore();
+            }
+            
+            if (!gameOver) {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
+            
+            updateStatus();
+        };
+        
+        cells.forEach((cell, index) => {
+            cell.addEventListener('click', () => {
+                handleCellClick(index);
+            });
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            resetGame();
+            updateScore();
+        });
+    </script>
+</body>
+
+</html>
